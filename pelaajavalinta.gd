@@ -130,6 +130,20 @@ func find_next_player(dict):
 			highest = dict[player]
 	return highest + 1
 
+func is_in_transit_area(key):
+	var plr = find_player(players_dict[key])
+	if plr.pos_x >= 2 && plr.pos_x <= 4 && plr.pos_z >= 2 && plr.pos_z <= 4:
+		return true
+	else:
+		return false
+
+func check_player_positions():
+	var readyplrs: int = 0
+	for plr in get_tree().get_nodes_in_group("pelaajat"):
+		if plr.pos_x >= 2 && plr.pos_x <= 4 && plr.pos_z >= 3 && plr.pos_z <= 5:
+			readyplrs += 1
+	print(readyplrs)
+	
 func update_blocks(d):
 	var xdist: float
 	var zdist: float
@@ -160,3 +174,5 @@ func _ready():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	update_blocks(delta)
+	if players_dict.size() > 0:
+		check_player_positions()
