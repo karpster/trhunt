@@ -1,0 +1,24 @@
+[gd_scene load_steps=4 format=3 uid="uid://b4bu317tu0lty"]
+
+[ext_resource type="Script" path="res://pelaaja.gd" id="1_ms6e6"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_a4n8h"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ujgiq"]
+
+[node name="pelaaja" type="Node3D" groups=["pelaajat"]]
+script = ExtResource("1_ms6e6")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_a4n8h")
+surface_material_override/0 = SubResource("StandardMaterial3D_ujgiq")
+
+[node name="Ray" type="RayCast3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+visible = false
+collide_with_areas = true
+debug_shape_custom_color = Color(0, 1, 0, 1)
+
+[node name="player_timer" type="Timer" parent="."]
+wait_time = 0.2
+one_shot = true

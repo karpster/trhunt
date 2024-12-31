@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://bp0a3vsvvrubt"]
+
+[ext_resource type="Script" path="res://aarre.gd" id="1_46fqb"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_0q88e"]
+
+[node name="aarre" type="Node3D" groups=["aarteet"]]
+script = ExtResource("1_46fqb")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("CylinderMesh_0q88e")
