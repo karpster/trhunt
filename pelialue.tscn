@@ -4,6 +4,10 @@
 
 [node name="pelialue" type="Node3D"]
 script = ExtResource("1_j13gs")
+camspeed = null
+grid_width = null
+grid_height = null
+no_of_players = null
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.418311, 0.908304, 0, -0.908304, 0.418311, 5, 14, 16)

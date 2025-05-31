@@ -1,12 +1,11 @@
 extends Node3D
 
-# add script to check when all players in ready zone for scene transition
+#create scene where player can interact to change size of game area
 
 var palikka = preload("res://palikka.tscn")
 var player = preload("res://pelaaja.tscn")
 var raja = preload("res://rajapala.tscn")
-var players_dict = {} # controller_id: player_id
-var spacing: float = 3
+var transit_ready: bool
 
 var init_area = [
 	[0,1,1,0],[0,1,2,0],[2,1,3,0],[0,1,4,0],[0,1,5,0],
@@ -55,13 +54,13 @@ func create_borders():
 	for i in borders.size():
 		var obj = raja.instantiate()
 		add_child(obj)
-		obj.transform.origin = Vector3(borders[i][1] * spacing, 0, borders[i][0] * spacing)
+		obj.transform.origin = Vector3(borders[i][1] * Global.spacing, 0, borders[i][0] * Global.spacing)
 
 func listen_to_input():
 	pass
 	
 func player_movement(pressed_event, eventdevice):
-	var plr = find_player(players_dict[eventdevice])
+	var plr = find_player(Global.players_dict[eventdevice])
 	if Input.is_action_pressed("moveleft"):
 		plr.move_left()
 	if Input.is_action_pressed("moveright"):
@@ -77,21 +76,21 @@ func find_player(pl_no):
 			return plr
 
 func remove_player(key):
-	var plr = find_player(players_dict[key])
-	players_dict.erase(key)
+	var plr = find_player(Global.players_dict[key])
+	Global.players_dict.erase(key)
 	plr.queue_free()
 	var i: int = 1
-	for player in players_dict:
-		plr = find_player(players_dict[player])
+	for player in Global.players_dict:
+		plr = find_player(Global.players_dict[player])
 		plr.playerno = i
-		players_dict[player] = i
+		Global.players_dict[player] = i
 		i += 1
 
 func create_player(key):
 	var plr
 	var pos
-	var next_player = find_next_player(players_dict)
-	players_dict[key] = next_player
+	var next_player = find_next_player(Global.players_dict)
+	Global.players_dict[key] = next_player
 	plr = player.instantiate()
 	add_child(plr)
 	pos = spawn_area[randi() % spawn_area.size()]
@@ -115,7 +114,7 @@ func check_player(pressed_event):
 	else:
 		eventdevice = "keyboard"
 		validcheck = true
-	if players_dict.has(eventdevice):
+	if Global.players_dict.has(eventdevice):
 		if pressed_event.is_action("cancel", true):
 			remove_player(eventdevice)
 		else:
@@ -131,7 +130,7 @@ func find_next_player(dict):
 	return highest + 1
 
 func is_in_transit_area(key):
-	var plr = find_player(players_dict[key])
+	var plr = find_player(Global.players_dict[key])
 	if plr.pos_x >= 2 && plr.pos_x <= 4 && plr.pos_z >= 2 && plr.pos_z <= 4:
 		return true
 	else:
@@ -142,7 +141,10 @@ func check_player_positions():
 	for plr in get_tree().get_nodes_in_group("pelaajat"):
 		if plr.pos_x >= 2 && plr.pos_x <= 4 && plr.pos_z >= 3 && plr.pos_z <= 5:
 			readyplrs += 1
-	print(readyplrs)
+	if readyplrs == Global.players_dict.size() && Global.players_dict.size() > 1:
+		transit_ready = true
+	else:
+		transit_ready = false
 	
 func update_blocks(d):
 	var xdist: float
@@ -152,27 +154,30 @@ func update_blocks(d):
 	objs.append_array(get_tree().get_nodes_in_group("pelaajat"))
 	objs.append_array(get_tree().get_nodes_in_group("aarteet"))
 	for obj in objs:
-		xdist = abs((obj.pos_x * spacing) - obj.global_position.x)
-		zdist = abs((obj.pos_z * spacing) - obj.global_position.x)
+		xdist = abs((obj.pos_x * Global.spacing) - obj.global_position.x)
+		zdist = abs((obj.pos_z * Global.spacing) - obj.global_position.x)
 		if xdist < 0.2:
-			obj.global_position.x = obj.pos_x * spacing
+			obj.global_position.x = obj.pos_x * Global.spacing
 		else:
-			obj.global_position.x += 8 * d * (obj.pos_x * spacing - obj.global_position.x)
+			obj.global_position.x += 8 * d * (obj.pos_x * Global.spacing - obj.global_position.x)
 		if zdist < 0.2:
-			obj.global_position.z = obj.pos_z * spacing
+			obj.global_position.z = obj.pos_z * Global.spacing
 		else:
-			obj.global_position.z += 8 * d * (obj.pos_z * spacing - obj.global_position.z)
+			obj.global_position.z += 8 * d * (obj.pos_z * Global.spacing - obj.global_position.z)
 
 func _input(event):
 	check_player(event)
+	if Global.players_dict.size() > 0:
+		check_player_positions()
 
 func _ready():
 	# create level
 	create_area()
 	create_borders()
+	transit_ready = false
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	update_blocks(delta)
-	if players_dict.size() > 0:
-		check_player_positions()
+	if transit_ready:
+		get_tree().change_scene_to_file("res://pelialue.tscn")

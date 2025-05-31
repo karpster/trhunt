@@ -9,7 +9,6 @@ var treasure = preload("res://aarre.tscn")
 @export var grid_width: int = 7
 @export var grid_height: int = 7
 @export var no_of_players: int = 2
-var spacing: float = 3
 var phase
 var player_turn: int = 1
 var turn_plr
@@ -25,26 +24,26 @@ func create_grid():
 			add_child(obj)
 			obj.pos_x = x
 			obj.pos_z = z
-			#obj.transform.origin = Vector3(x * spacing, 0, z * spacing)
+			#obj.transform.origin = Vector3(x * Global.spacing, 0, z * Global.spacing)
 			obj.rotate_y(deg_to_rad(random_rotation_90_degrees()))
 
 func create_borders():
 	for x in range(grid_width):
 		var obj = raja.instantiate()
 		add_child(obj)
-		obj.transform.origin = Vector3(x * spacing, 0, grid_height * spacing + 1)
+		obj.transform.origin = Vector3(x * Global.spacing, 0, grid_height * Global.spacing + 1)
 	for x in range(grid_width):
 		var obj = raja.instantiate()
 		add_child(obj)
-		obj.transform.origin = Vector3(x * spacing, 0, -1 * spacing)
+		obj.transform.origin = Vector3(x * Global.spacing, 0, -1 * Global.spacing)
 	for x in range(grid_height):
 		var obj = raja.instantiate()
 		add_child(obj)
-		obj.transform.origin = Vector3(-1 * spacing, 0, x * spacing)
+		obj.transform.origin = Vector3(-1 * Global.spacing, 0, x * Global.spacing)
 	for x in range(grid_height):
 		var obj = raja.instantiate()
 		add_child(obj)
-		obj.transform.origin = Vector3(grid_width * spacing + 1, 0, x * spacing)
+		obj.transform.origin = Vector3(grid_width * Global.spacing + 1, 0, x * Global.spacing)
 
 func create_spare():
 	var spare_obj = palikka.instantiate()
@@ -85,16 +84,16 @@ func update_blocks(d):
 	objs.append_array(get_tree().get_nodes_in_group("pelaajat"))
 	objs.append_array(get_tree().get_nodes_in_group("aarteet"))
 	for obj in objs:
-		xdist = abs((obj.pos_x * spacing) - obj.global_position.x)
-		zdist = abs((obj.pos_z * spacing) - obj.global_position.x)
+		xdist = abs((obj.pos_x * Global.spacing) - obj.global_position.x)
+		zdist = abs((obj.pos_z * Global.spacing) - obj.global_position.x)
 		if xdist < 0.2:
-			obj.global_position.x = obj.pos_x * spacing
+			obj.global_position.x = obj.pos_x * Global.spacing
 		else:
-			obj.global_position.x += 8 * d * (obj.pos_x * spacing - obj.global_position.x)
+			obj.global_position.x += 8 * d * (obj.pos_x * Global.spacing - obj.global_position.x)
 		if zdist < 0.2:
-			obj.global_position.z = obj.pos_z * spacing
+			obj.global_position.z = obj.pos_z * Global.spacing
 		else:
-			obj.global_position.z += 8 * d * (obj.pos_z * spacing - obj.global_position.z)
+			obj.global_position.z += 8 * d * (obj.pos_z * Global.spacing - obj.global_position.z)
 
 func camera_movement(d):
 	if Input.is_action_pressed("camleft"):
@@ -243,9 +242,12 @@ func phase_control():
 func _ready():
 	create_grid()
 	create_spare()
-	add_players(no_of_players)
+	add_players(Global.players_dict.size())
 	create_borders()
 	phase = "spare_movement"
+
+func _input(event):
+	
 
 func _process(delta):
 	camera_movement(delta)
