@@ -128,23 +128,19 @@ func spare_position(blok):
 func spare_movement():
 	var spare_block
 	spare_block = find_spare()
-	if  $cooldown_timer.time_left == 0 && Input.is_action_pressed("moveleft"):
-		spare_block.move_left(grid_width, grid_height)
-		$cooldown_timer.start()
-	if $cooldown_timer.time_left == 0 && Input.is_action_pressed("moveright"):
-		spare_block.move_right(grid_width, grid_height)
-		$cooldown_timer.start()
-	if $cooldown_timer.time_left == 0 && Input.is_action_pressed("moveup"):
-		spare_block.move_up(grid_width, grid_height)
-		$cooldown_timer.start()
-	if $cooldown_timer.time_left == 0 && Input.is_action_pressed("movedown"):
-		spare_block.move_down(grid_width, grid_height)
-		$cooldown_timer.start()
-	if $cooldown_timer.time_left == 0 && Input.is_action_pressed("rotate_left"):
-		spare_block.rotate_left()
-		$cooldown_timer.start()
-	if $cooldown_timer.time_left == 0 && Input.is_action_pressed("rotate_right"):
-		spare_block.rotate_right()
+	if $cooldown_timer.time_left == 0:
+		if Input.is_action_pressed("moveleft"):
+			spare_block.move_left(grid_width, grid_height)
+		if Input.is_action_pressed("moveright"):
+			spare_block.move_right(grid_width, grid_height)
+		if Input.is_action_pressed("moveup"):
+			spare_block.move_up(grid_width, grid_height)
+		if Input.is_action_pressed("movedown"):
+			spare_block.move_down(grid_width, grid_height)
+		if Input.is_action_pressed("rotate_left"):
+			spare_block.rotate_left()
+		if Input.is_action_pressed("rotate_right"):
+			spare_block.rotate_right()
 		$cooldown_timer.start()
 
 func spare_action():
@@ -238,7 +234,7 @@ func phase_control():
 	elif phase == "spare_movement":
 		turn_plr = find_player(player_turn)
 		phase = "player_movement"
-
+	
 func _ready():
 	create_grid()
 	create_spare()
@@ -247,10 +243,11 @@ func _ready():
 	phase = "spare_movement"
 
 func _input(event):
-	pass
-
+	Global.identify_input(event)
+	
 func _process(delta):
 	camera_movement(delta)
+	#Global.players_dict[eventdevice]
 	if phase == "spare_movement":
 		spare_movement()
 		spare_action()

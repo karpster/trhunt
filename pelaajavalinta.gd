@@ -5,7 +5,7 @@ extends Node3D
 var palikka = preload("res://palikka.tscn")
 var player = preload("res://pelaaja.tscn")
 var raja = preload("res://rajapala.tscn")
-var transit_ready: bool
+var level_transit_ready: bool
 
 var init_area = [
 	[0,1,1,0],[0,1,2,0],[2,1,3,0],[0,1,4,0],[0,1,5,0],
@@ -66,11 +66,8 @@ func create_options():
 	# luo oikea yläkulma
 	# luo vasen alakulma
 	# luo oikea alakulma
-
-func listen_to_input():
-	pass
 	
-func player_action(pressed_event, eventdevice):
+func player_input(pressed_event, eventdevice):
 	var plr = find_player(Global.players_dict[eventdevice])
 	print(plr)
 	if Input.is_action_pressed("moveleft"):
@@ -85,6 +82,11 @@ func player_action(pressed_event, eventdevice):
 		pass
 		# if on top of option square, adjust option
 		# if in transit area, mark player as ready
+		if is_in_transit_area(Global.players_dict[eventdevice]):
+			if plr.transit_ready == true:
+				plr.transit_ready = false
+			else:
+				plr.transit_ready = true
 
 func find_player(pl_no):
 	for plr in get_tree().get_nodes_in_group("pelaajat"):
@@ -113,34 +115,18 @@ func create_player(key):
 	plr.pos_x = pos[1]
 	plr.pos_z = pos[0]
 	plr.playerno = next_player
+	plr.transit_ready = false
 
 func check_player(pressed_event):
-	var eventdevice
-	# check if device of event is keyboard or controller
-	var validcheck: bool = false
-	if pressed_event is InputEventMouseMotion or pressed_event is InputEventMouseButton:
-		validcheck = false
-	elif (pressed_event is InputEventJoypadButton):
-		eventdevice = pressed_event.get_device()
-		validcheck = true
-	elif pressed_event is InputEventJoypadMotion && pressed_event.get_axis() >= 0 && pressed_event.get_axis() <= 3:
-		eventdevice = pressed_event.get_device()
-		validcheck = true
-	elif pressed_event is InputEventJoypadMotion && pressed_event.get_axis() >= 4:
-		validcheck = false
-	else:
-		eventdevice = "keyboard"
-		validcheck = true
-	
 	# if player exists in field, process input (cancel removes player, any other is processed as is)
 	# or if player doesn't exist, create player
-	if Global.players_dict.has(eventdevice):
+	if Global.players_dict.has(Global.eventdevice):
 		if pressed_event.is_action("cancel", true):
-			remove_player(eventdevice)
+			remove_player(Global.eventdevice)
 		else:
-			player_action(pressed_event, eventdevice)
-	elif validcheck == true && !pressed_event.is_action("cancel", true):
-		create_player(eventdevice)
+			player_input(pressed_event, Global.eventdevice)
+	elif Global.validcheck == true && !pressed_event.is_action("cancel", true):
+		create_player(Global.eventdevice)
 		
 func find_next_player(dict):
 	var highest = 0
@@ -159,12 +145,12 @@ func is_in_transit_area(key):
 func check_player_positions():
 	var readyplrs: int = 0
 	for plr in get_tree().get_nodes_in_group("pelaajat"):
-		if plr.pos_x >= 2 && plr.pos_x <= 4 && plr.pos_z >= 3 && plr.pos_z <= 5:
+		if plr.transit_ready == true:
 			readyplrs += 1
 	if readyplrs == Global.players_dict.size() && Global.players_dict.size() > 1:
-		transit_ready = true
+		level_transit_ready = true
 	else:
-		transit_ready = false
+		level_transit_ready = false
 	
 func update_blocks(d):
 	var xdist: float
@@ -186,6 +172,7 @@ func update_blocks(d):
 			obj.global_position.z += 8 * d * (obj.pos_z * Global.spacing - obj.global_position.z)
 
 func _input(event):
+	Global.identify_input(event)
 	check_player(event)
 	if Global.players_dict.size() > 0:
 		check_player_positions()
@@ -195,10 +182,10 @@ func _ready():
 	create_area()
 	create_borders()
 	create_options()
-	transit_ready = false
+	level_transit_ready = false
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	update_blocks(delta)
-	if transit_ready:
+	if level_transit_ready:
 		get_tree().change_scene_to_file("res://pelialue.tscn")

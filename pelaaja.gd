@@ -4,6 +4,7 @@ var pos_x: int
 var pos_z: int
 var playerno: int
 var score: int = 0
+var transit_ready: bool
 
 func check_direction(dir):
 	var allowed = false
