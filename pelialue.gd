@@ -6,9 +6,9 @@ var raja = preload("res://rajapala.tscn")
 var treasure = preload("res://aarre.tscn")
 
 @export var camspeed: float = 5.0
-@export var grid_width: int = 7
-@export var grid_height: int = 7
-@export var no_of_players: int = 2
+var grid_width: int = Global.map_width
+var grid_height: int = Global.map_height
+var no_of_players: int = Global.players_dict.size()
 var phase
 var player_turn: int = 1
 var turn_plr
@@ -247,7 +247,7 @@ func _ready():
 	phase = "spare_movement"
 
 func _input(event):
-	
+	pass
 
 func _process(delta):
 	camera_movement(delta)

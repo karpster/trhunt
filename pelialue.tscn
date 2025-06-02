@@ -1,13 +1,9 @@
 [gd_scene load_steps=2 format=3 uid="uid://cfywyjjspq6fk"]
 
-[ext_resource type="Script" path="res://pelialue.gd" id="1_j13gs"]
+[ext_resource type="Script" uid="uid://b5hw7i073w48l" path="res://pelialue.gd" id="1_j13gs"]
 
 [node name="pelialue" type="Node3D"]
 script = ExtResource("1_j13gs")
-camspeed = null
-grid_width = null
-grid_height = null
-no_of_players = null
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.418311, 0.908304, 0, -0.908304, 0.418311, 5, 14, 16)

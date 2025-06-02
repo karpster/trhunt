@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://b4bu317tu0lty"]
 
-[ext_resource type="Script" path="res://pelaaja.gd" id="1_ms6e6"]
+[ext_resource type="Script" uid="uid://dj6hyvcuwbylv" path="res://pelaaja.gd" id="1_ms6e6"]
 
 [sub_resource type="SphereMesh" id="SphereMesh_a4n8h"]
 

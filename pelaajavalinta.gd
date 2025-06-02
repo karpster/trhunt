@@ -1,6 +1,6 @@
 extends Node3D
 
-#create scene where player can interact to change size of game area
+#create scene where player can interact to change size of game area: optionblock
 
 var palikka = preload("res://palikka.tscn")
 var player = preload("res://pelaaja.tscn")
@@ -41,6 +41,10 @@ var borders = [
 	[9,-1],[9,0],[9,1],[9,2],[9,3],[9,4],[9,5],[9,6],[9,7]
 	]
 	
+var optionblocks = [
+	1
+]
+
 func create_area():
 	for i in init_area.size():
 		var obj = palikka.instantiate()
@@ -56,11 +60,19 @@ func create_borders():
 		add_child(obj)
 		obj.transform.origin = Vector3(borders[i][1] * Global.spacing, 0, borders[i][0] * Global.spacing)
 
+func create_options():
+	pass
+	# luo vasen yläkulma
+	# luo oikea yläkulma
+	# luo vasen alakulma
+	# luo oikea alakulma
+
 func listen_to_input():
 	pass
 	
-func player_movement(pressed_event, eventdevice):
+func player_action(pressed_event, eventdevice):
 	var plr = find_player(Global.players_dict[eventdevice])
+	print(plr)
 	if Input.is_action_pressed("moveleft"):
 		plr.move_left()
 	if Input.is_action_pressed("moveright"):
@@ -69,6 +81,10 @@ func player_movement(pressed_event, eventdevice):
 		plr.move_up()
 	if Input.is_action_pressed("movedown"):
 		plr.move_down()
+	if Input.is_action_pressed("action"):
+		pass
+		# if on top of option square, adjust option
+		# if in transit area, mark player as ready
 
 func find_player(pl_no):
 	for plr in get_tree().get_nodes_in_group("pelaajat"):
@@ -100,6 +116,7 @@ func create_player(key):
 
 func check_player(pressed_event):
 	var eventdevice
+	# check if device of event is keyboard or controller
 	var validcheck: bool = false
 	if pressed_event is InputEventMouseMotion or pressed_event is InputEventMouseButton:
 		validcheck = false
@@ -114,11 +131,14 @@ func check_player(pressed_event):
 	else:
 		eventdevice = "keyboard"
 		validcheck = true
+	
+	# if player exists in field, process input (cancel removes player, any other is processed as is)
+	# or if player doesn't exist, create player
 	if Global.players_dict.has(eventdevice):
 		if pressed_event.is_action("cancel", true):
 			remove_player(eventdevice)
 		else:
-			player_movement(pressed_event, eventdevice)
+			player_action(pressed_event, eventdevice)
 	elif validcheck == true && !pressed_event.is_action("cancel", true):
 		create_player(eventdevice)
 		
@@ -174,6 +194,7 @@ func _ready():
 	# create level
 	create_area()
 	create_borders()
+	create_options()
 	transit_ready = false
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://bp0a3vsvvrubt"]
 
-[ext_resource type="Script" path="res://aarre.gd" id="1_46fqb"]
+[ext_resource type="Script" uid="uid://c7qs535gn4khm" path="res://aarre.gd" id="1_46fqb"]
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_0q88e"]
 

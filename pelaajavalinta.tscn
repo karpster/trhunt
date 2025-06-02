@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://cuvvmlhg2wp1n"]
 
-[ext_resource type="Script" path="res://pelaajavalinta.gd" id="1_d81lr"]
+[ext_resource type="Script" uid="uid://bl0rhaqq3lgco" path="res://pelaajavalinta.gd" id="1_d81lr"]
 
 [node name="pelaajavalinta" type="Node3D"]
 script = ExtResource("1_d81lr")
