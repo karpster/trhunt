@@ -12,6 +12,8 @@ var no_of_players: int = Global.players_dict.size()
 var phase
 var player_turn: int = 1
 var turn_plr
+var match_ongoing: bool
+var MAX_SCORE: int = 5
 	
 func random_rotation_90_degrees() -> int:
 	var rotations = [0,90,180,270]
@@ -131,37 +133,35 @@ func spare_movement():
 	if $cooldown_timer.time_left == 0:
 		if Input.is_action_pressed("moveleft"):
 			spare_block.move_left(grid_width, grid_height)
-		if Input.is_action_pressed("moveright"):
+		elif Input.is_action_pressed("moveright"):
 			spare_block.move_right(grid_width, grid_height)
-		if Input.is_action_pressed("moveup"):
+		elif Input.is_action_pressed("moveup"):
 			spare_block.move_up(grid_width, grid_height)
-		if Input.is_action_pressed("movedown"):
+		elif Input.is_action_pressed("movedown"):
 			spare_block.move_down(grid_width, grid_height)
-		if Input.is_action_pressed("rotate_left"):
+		elif Input.is_action_pressed("rotate_left"):
 			spare_block.rotate_left()
-		if Input.is_action_pressed("rotate_right"):
+		elif Input.is_action_pressed("rotate_right"):
 			spare_block.rotate_right()
+		elif Input.is_action_pressed("action"):
+			spare_action(spare_block)
 		$cooldown_timer.start()
 
-func spare_action():
-	var spare_block
-	spare_block = find_spare()
-	if Input.is_action_pressed("action") && $cooldown_timer.time_left == 0:
-		$cooldown_timer.start()
-		var spare_pos = spare_position(spare_block)
-		var spare_coord: int
-		if spare_pos == "left" || spare_pos == "right":
-			spare_coord = spare_block.pos_z
-		elif spare_pos == "up"  || spare_pos == "down":
-			spare_coord = spare_block.pos_x
-		spare_block.extrablock = false
-		switch_block(spare_block, spare_pos, spare_coord, 2)
-		for blok in get_tree().get_nodes_in_group("palikat"):
-			if blok != spare_block:
-				switch_block(blok, spare_pos, spare_coord, 1)
-		for plr in get_tree().get_nodes_in_group("pelaajat"):
-			switch_block(plr, spare_pos, spare_coord, 1)
-		phase_control()
+func spare_action(spare_block):
+	var spare_pos = spare_position(spare_block)
+	var spare_coord: int
+	if spare_pos == "left" || spare_pos == "right":
+		spare_coord = spare_block.pos_z
+	elif spare_pos == "up"  || spare_pos == "down":
+		spare_coord = spare_block.pos_x
+	spare_block.extrablock = false
+	switch_block(spare_block, spare_pos, spare_coord, 2)
+	for blok in get_tree().get_nodes_in_group("palikat"):
+		if blok != spare_block:
+			switch_block(blok, spare_pos, spare_coord, 1)
+	for plr in get_tree().get_nodes_in_group("pelaajat"):
+		switch_block(plr, spare_pos, spare_coord, 1)
+	phase_control()
 
 func switch_block(blok, direction, coord, multiplier):
 	if direction == "left" && blok.pos_z == coord:
@@ -218,7 +218,13 @@ func check_treasure(x, z, plr_no):
 			instantiate_treasure(obj.pos_x, obj.pos_z, obj.assigned_plr)
 			checkresult = true
 	return checkresult
-	
+
+func check_scores():
+	for plr in get_tree().get_nodes_in_group("pelaajat"):
+		if plr.score == MAX_SCORE:
+			match_ongoing = false
+			
+
 func player_action():
 	if Input.is_action_pressed("action") && $cooldown_timer.time_left == 0:
 		phase_control()
@@ -240,6 +246,7 @@ func _ready():
 	create_spare()
 	add_players(Global.players_dict.size())
 	create_borders()
+	match_ongoing = true
 	phase = "spare_movement"
 
 func _input(event):
@@ -247,11 +254,10 @@ func _input(event):
 	
 func _process(delta):
 	# if inputdevice is same as player number then process
-	if Global.players_dict[Global.eventdevice] == turn_plr:
+	if Global.players_dict[Global.eventdevice] == player_turn:
 		camera_movement(delta)
 		if phase == "spare_movement":
 			spare_movement()
-			spare_action()
 		if phase == "player_movement":
 			player_movement()
 			player_action()
@@ -265,10 +271,6 @@ func _process(delta):
 	# settings
 	# quit
 	# jotain touhua taustalle (esim labyrintti jossa tapahtuu jotain)
-# lokaalin pelin polku
-	# ohjainten tunnistus
-	# ohjainten asettaminen pelaajille
-	# pelaajan liikuttamisskriptin päivitys
 # online-pelin polku
 	# opiskele
 # # pelin aikainen UI
@@ -278,4 +280,5 @@ func _process(delta):
 # äänet
 # kameran säätäminen sopivaan kohtaan
 	# eli näkyy vähintään vastakkainen kulma pelilaudalta verrattuna liikuteltavaan objektiin
+	# ohjaimen oikealla tatilla voi siirtää näkymää pois päin
 # pomppujen korjaus

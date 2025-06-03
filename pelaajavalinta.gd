@@ -78,7 +78,6 @@ func player_input(pressed_event, eventdevice):
 	if Input.is_action_pressed("movedown"):
 		plr.move_down()
 	if Input.is_action_pressed("action"):
-		pass
 		# if on top of option square, adjust option
 		# if in transit area, mark player as ready
 		if is_in_transit_area(plr):
@@ -172,6 +171,7 @@ func update_blocks(d):
 func _input(event):
 	Global.identify_input(event)
 	check_player(event)
+	
 	if Global.players_dict.size() > 0:
 		check_player_positions()
 
