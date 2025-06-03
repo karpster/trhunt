@@ -246,14 +246,15 @@ func _input(event):
 	Global.identify_input(event)
 	
 func _process(delta):
-	camera_movement(delta)
-	#Global.players_dict[eventdevice]
-	if phase == "spare_movement":
-		spare_movement()
-		spare_action()
-	if phase == "player_movement":
-		player_movement()
-		player_action()
+	# if inputdevice is same as player number then process
+	if Global.players_dict[Global.eventdevice] == turn_plr:
+		camera_movement(delta)
+		if phase == "spare_movement":
+			spare_movement()
+			spare_action()
+		if phase == "player_movement":
+			player_movement()
+			player_action()
 	update_blocks(delta)
 		
 	

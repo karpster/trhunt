@@ -69,7 +69,6 @@ func create_options():
 	
 func player_input(pressed_event, eventdevice):
 	var plr = find_player(Global.players_dict[eventdevice])
-	print(plr)
 	if Input.is_action_pressed("moveleft"):
 		plr.move_left()
 	if Input.is_action_pressed("moveright"):
@@ -82,12 +81,12 @@ func player_input(pressed_event, eventdevice):
 		pass
 		# if on top of option square, adjust option
 		# if in transit area, mark player as ready
-		if is_in_transit_area(Global.players_dict[eventdevice]):
+		if is_in_transit_area(plr):
 			if plr.transit_ready == true:
 				plr.transit_ready = false
 			else:
 				plr.transit_ready = true
-
+		
 func find_player(pl_no):
 	for plr in get_tree().get_nodes_in_group("pelaajat"):
 		if plr.playerno == pl_no:
@@ -135,8 +134,7 @@ func find_next_player(dict):
 			highest = dict[player]
 	return highest + 1
 
-func is_in_transit_area(key):
-	var plr = find_player(Global.players_dict[key])
+func is_in_transit_area(plr):
 	if plr.pos_x >= 2 && plr.pos_x <= 4 && plr.pos_z >= 2 && plr.pos_z <= 4:
 		return true
 	else:
