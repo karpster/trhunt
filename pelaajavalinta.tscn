@@ -5,12 +5,12 @@
 [node name="pelaajavalinta" type="Node3D"]
 script = ExtResource("1_d81lr")
 
-[node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.418311, 0.908304, 0, -0.908304, 0.418311, 5, 14, 23.4583)
-
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.468439, 7.68675, -0.959017)
 
 [node name="cooldown_timer" type="Timer" parent="."]
 wait_time = 0.2
 one_shot = true
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(0.62388, 0, -0.78152, 0, 1, 0, 0.78152, 0, 0.62388, 0, 50, 5.944)

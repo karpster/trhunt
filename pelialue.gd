@@ -14,6 +14,9 @@ var player_turn: int = 1
 var turn_plr
 var match_ongoing: bool
 var MAX_SCORE: int = 5
+var CAM_MIN_X: int
+var CAM_MIN_Z: int
+
 	
 func random_rotation_90_degrees() -> int:
 	var rotations = [0,90,180,270]
@@ -98,6 +101,8 @@ func update_blocks(d):
 			obj.global_position.z += 8 * d * (obj.pos_z * Global.spacing - obj.global_position.z)
 
 func camera_movement(d):
+	var target_pos = turn_plr.global_transform.origin
+	var clamped_x = clamp(target_pos.x, )
 	if Input.is_action_pressed("camleft"):
 		$Camera3D.transform.origin.x -= camspeed * d
 	if Input.is_action_pressed("camright"):
@@ -253,26 +258,23 @@ func _input(event):
 	Global.identify_input(event)
 	
 func _process(delta):
-	# if inputdevice is same as player number then process
-	if Global.players_dict[Global.eventdevice] == player_turn:
-		camera_movement(delta)
-		if phase == "spare_movement":
-			spare_movement()
-		if phase == "player_movement":
-			player_movement()
-			player_action()
-	update_blocks(delta)
+	if match_ongoing == true:
+		# if inputdevice is same as player number then process
+		if Global.players_dict[Global.eventdevice] == player_turn:
+			camera_movement(delta)
+			if phase == "spare_movement":
+				spare_movement()
+			if phase == "player_movement":
+				player_movement()
+				player_action()
+		update_blocks(delta)
 		
 	
 # To do:
 # päävalikko
-	# local game
-	# online game
+	# Begin (avaa pelaajavalinta-scenen)
 	# settings
 	# quit
-	# jotain touhua taustalle (esim labyrintti jossa tapahtuu jotain)
-# online-pelin polku
-	# opiskele
 # # pelin aikainen UI
 	# vuoro
 	# pistetilanne
@@ -282,3 +284,7 @@ func _process(delta):
 	# eli näkyy vähintään vastakkainen kulma pelilaudalta verrattuna liikuteltavaan objektiin
 	# ohjaimen oikealla tatilla voi siirtää näkymää pois päin
 # pomppujen korjaus
+# Loppuruutu
+	# Teksti
+	# Tausta-alueen sumennus
+	# Siirtymä napin painalluksella

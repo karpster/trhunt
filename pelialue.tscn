@@ -4,9 +4,11 @@
 
 [node name="pelialue" type="Node3D"]
 script = ExtResource("1_j13gs")
+camspeed = null
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.418311, 0.908304, 0, -0.908304, 0.418311, 5, 14, 16)
+projection = 1
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.468439, 7.68675, -0.959017)

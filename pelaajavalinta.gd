@@ -168,6 +168,18 @@ func update_blocks(d):
 		else:
 			obj.global_position.z += 8 * d * (obj.pos_z * Global.spacing - obj.global_position.z)
 
+func setup_camera():
+	pass
+	var cam = $Camera3D
+	var grid_size = 30
+	var screen_aspect = cam.get_viewport().size.x / cam.get_viewport().size.y
+	if screen_aspect >= 1.0:
+		cam.size = grid_size / 2.0
+	else:
+		cam.size = (grid_size / 2.0) / screen_aspect
+	cam.transform.origin = Vector3(10,20,15)
+	cam.look_at(Vector3(10,0,12.5),Vector3(0,0,-1))
+	
 func _input(event):
 	Global.identify_input(event)
 	check_player(event)
@@ -180,6 +192,7 @@ func _ready():
 	create_area()
 	create_borders()
 	create_options()
+	setup_camera()
 	level_transit_ready = false
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
