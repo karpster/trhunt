@@ -5,10 +5,10 @@ var player = preload("res://pelaaja.tscn")
 var raja = preload("res://rajapala.tscn")
 var treasure = preload("res://aarre.tscn")
 
-@export var camspeed: float = 5.0
+@export var camspeed: float = 10.0
 var grid_width: int = Global.map_width
 var grid_height: int = Global.map_height
-var no_of_players: int = Global.players_dict.size()
+var no_of_players: int
 var phase
 var player_turn: int = 1
 var turn_plr
@@ -16,7 +16,12 @@ var match_ongoing: bool
 var MAX_SCORE: int = 5
 var CAM_MIN_X: int
 var CAM_MIN_Z: int
-
+var cam_vis_width: float
+var cam_vis_height: float
+var obj_pos
+var cam_x_mod: float
+var cam_z_mod: float
+var cam_new_pos: Vector3
 	
 func random_rotation_90_degrees() -> int:
 	var rotations = [0,90,180,270]
@@ -99,18 +104,28 @@ func update_blocks(d):
 			obj.global_position.z = obj.pos_z * Global.spacing
 		else:
 			obj.global_position.z += 8 * d * (obj.pos_z * Global.spacing - obj.global_position.z)
-
+	
 func camera_movement(d):
-	var target_pos = turn_plr.global_transform.origin
-	var clamped_x = clamp(target_pos.x, )
+	if phase == "spare_movement":
+		obj_pos = find_spare().global_transform.origin
+	elif phase == "player_movement":
+		obj_pos = find_player(player_turn).global_transform.origin
+	var clamped_x = clamp(obj_pos.x, 1, grid_width * Global.spacing - 5)
+	var clamped_z = clamp(obj_pos.z, 1, grid_height * Global.spacing - 5)
 	if Input.is_action_pressed("camleft"):
-		$Camera3D.transform.origin.x -= camspeed * d
+		cam_x_mod -= camspeed * d
 	if Input.is_action_pressed("camright"):
-		$Camera3D.transform.origin.x += camspeed * d
+		cam_x_mod += camspeed * d
 	if Input.is_action_pressed("camup"):
-		$Camera3D.transform.origin.z -= camspeed * d
+		cam_z_mod -= camspeed * d
 	if Input.is_action_pressed("camdown"):
-		$Camera3D.transform.origin.z += camspeed * d
+		cam_z_mod += camspeed * d
+	if Input.is_action_just_released("camleft") || Input.is_action_just_released("camright"):
+		cam_x_mod = 0
+	if Input.is_action_just_released("camup") || Input.is_action_just_released("camdown"):
+		cam_z_mod = 0
+	cam_new_pos = Vector3(clamped_x + cam_x_mod, $Camera3D.transform.origin.y, clamped_z + cam_z_mod)
+	$Camera3D.transform.origin = $Camera3D.transform.origin.lerp(cam_new_pos, 0.1)
 
 func find_spare():
 	for blok in get_tree().get_nodes_in_group("palikat"):
@@ -132,25 +147,26 @@ func spare_position(blok):
 	elif blok.pos_z > grid_height:
 		return "down"
 
-func spare_movement():
+func spare_movement(delta):
 	var spare_block
 	spare_block = find_spare()
-	if $cooldown_timer.time_left == 0:
-		if Input.is_action_pressed("moveleft"):
-			spare_block.move_left(grid_width, grid_height)
-		elif Input.is_action_pressed("moveright"):
-			spare_block.move_right(grid_width, grid_height)
-		elif Input.is_action_pressed("moveup"):
-			spare_block.move_up(grid_width, grid_height)
-		elif Input.is_action_pressed("movedown"):
-			spare_block.move_down(grid_width, grid_height)
-		elif Input.is_action_pressed("rotate_left"):
-			spare_block.rotate_left()
-		elif Input.is_action_pressed("rotate_right"):
-			spare_block.rotate_right()
-		elif Input.is_action_pressed("action"):
+#	if $cooldown_timer.time_left == 0:
+	if Input.is_action_pressed("moveleft"):
+		spare_block.move_left(grid_width, grid_height)
+	elif Input.is_action_pressed("moveright"):
+		spare_block.move_right(grid_width, grid_height)
+	elif Input.is_action_pressed("moveup"):
+		spare_block.move_up(grid_width, grid_height)
+	elif Input.is_action_pressed("movedown"):
+		spare_block.move_down(grid_width, grid_height)
+	elif Input.is_action_pressed("rotate_left"):
+		spare_block.rotate_left()
+	elif Input.is_action_pressed("rotate_right"):
+		spare_block.rotate_right()
+	elif Input.is_action_pressed("action"):
+		if $cooldown_timer.time_left == 0:
 			spare_action(spare_block)
-		$cooldown_timer.start()
+			$cooldown_timer.start()
 
 func spare_action(spare_block):
 	var spare_pos = spare_position(spare_block)
@@ -247,44 +263,36 @@ func phase_control():
 		phase = "player_movement"
 	
 func _ready():
+	if Global.players_dict.size() >= 1:
+		pass
+	else:
+		Global.players_dict["keyboard"] = 1
+	no_of_players = Global.players_dict.size()
 	create_grid()
 	create_spare()
 	add_players(Global.players_dict.size())
 	create_borders()
 	match_ongoing = true
 	phase = "spare_movement"
+	turn_plr = find_player(player_turn)
+	Global.setup_camera($Camera3D)
 
 func _input(event):
 	Global.identify_input(event)
 	
 func _process(delta):
+	update_blocks(delta)
 	if match_ongoing == true:
-		# if inputdevice is same as player number then process
-		if Global.players_dict[Global.eventdevice] == player_turn:
-			camera_movement(delta)
-			if phase == "spare_movement":
-				spare_movement()
-			if phase == "player_movement":
-				player_movement()
-				player_action()
-		update_blocks(delta)
-		
+		if Global.eventdevice != null:
+			# if inputdevice is same as player number then process
+			if Global.players_dict[Global.eventdevice] == player_turn:
+				#camera_movement(delta)
+				if phase == "spare_movement":
+					spare_movement(delta)
+				if phase == "player_movement":
+					player_movement()
+					player_action()
+	camera_movement(delta)
 	
-# To do:
-# päävalikko
-	# Begin (avaa pelaajavalinta-scenen)
-	# settings
-	# quit
-# # pelin aikainen UI
-	# vuoro
-	# pistetilanne
-# rotaation animointi
-# äänet
-# kameran säätäminen sopivaan kohtaan
-	# eli näkyy vähintään vastakkainen kulma pelilaudalta verrattuna liikuteltavaan objektiin
-	# ohjaimen oikealla tatilla voi siirtää näkymää pois päin
-# pomppujen korjaus
-# Loppuruutu
-	# Teksti
-	# Tausta-alueen sumennus
-	# Siirtymä napin painalluksella
+# to-do:
+# https://trello.com/b/ZQvWv9RW/pelilabyrintti

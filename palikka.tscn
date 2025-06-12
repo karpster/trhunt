@@ -32,3 +32,11 @@ mesh = SubResource("BoxMesh_207hd")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="wall3/Area3D"]
 shape = SubResource("BoxShape3D_h1wm4")
+
+[node name="movTimer" type="Timer" parent="."]
+wait_time = 0.2
+one_shot = true
+
+[node name="rotTimer" type="Timer" parent="."]
+wait_time = 0.2
+one_shot = true
