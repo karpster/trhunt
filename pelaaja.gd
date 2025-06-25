@@ -6,44 +6,44 @@ var playerno: int
 var score: int = 0
 var transit_ready: bool
 
-func check_direction(dir):
+func check_dir():
 	var allowed = false
-	if dir == "left":
-		$Ray.target_position = Vector3(-3,0,0)
-	if dir == "right":
-		$Ray.target_position = Vector3(3,0,0)
-	if dir == "up":
-		$Ray.target_position = Vector3(0,0,-3)
-	if dir == "down":
-		$Ray.target_position = Vector3(0,0,3)
+	$Ray.target_position = Vector3(0,0,3)
 	$Ray.force_raycast_update()
 	if $Ray.get_collider() == null:
 		allowed = true
 	return allowed
 	
 func move_left():
-	if check_direction("left") && $player_timer.time_left == 0:
+	self.rotation_degrees.y = -90
+	if check_dir() && $player_timer.time_left == 0:
 		pos_x -= 1
 		$player_timer.start()
+		$AnimationPlayer.play("walk1")
 
 func move_right():
-	if check_direction("right") && $player_timer.time_left == 0:
+	self.rotation_degrees.y = 90
+	if check_dir() && $player_timer.time_left == 0:
 		pos_x += 1
 		$player_timer.start()
+		$AnimationPlayer.play("walk1")
 
 func move_up():
-	if check_direction("up") && $player_timer.time_left == 0:
+	self.rotation_degrees.y = 180
+	if check_dir() && $player_timer.time_left == 0:
 		pos_z -= 1
 		$player_timer.start()
+		$AnimationPlayer.play("walk1")
 		
 func move_down():
-	if check_direction("down") && $player_timer.time_left == 0:
+	self.rotation_degrees.y = 0
+	if check_dir() && $player_timer.time_left == 0:
 		pos_z += 1
 		$player_timer.start()
+		$AnimationPlayer.play("walk1")
 
 func _ready():
-	pass # Replace with function body.
-
+	$AnimationPlayer.animation_set_next("walk1","idle1")
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
